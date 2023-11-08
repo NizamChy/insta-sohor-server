@@ -65,6 +65,30 @@ async function run() {
       res.send(result);
     })
 
+    app.put('/allposts/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = { upsert: true };
+
+      const updatedPost =req.body;
+      const post = {
+        $set: {
+            name: updatedPost.name,
+            title: updatedPost.title,
+            image: updatedPost.image,
+            category: updatedPost.category,
+            descriptionSummary: updatedPost.descriptionSummary,
+            descriptionDetail: updatedPost.descriptionDetail,
+            userPhotoURL: updatedPost.userPhotoURL,
+            userEmail: updatedPost.userEmail,
+            timestamp: updatedPost.timestamp,
+        }
+      }
+
+      const result = await postsCollection.updateOne(filter, post, options);
+      res.send(result);
+    })
+
     app.post('/allposts', async(req, res) =>{
       const newPost = req.body;
       console.log(newPost);
