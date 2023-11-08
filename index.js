@@ -1,16 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-
 //midleware
 app.use(cors());
 app.use(express.json());
-
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9s9fb7y.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -20,13 +17,13 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7) 
-    // await client.connect(); 
+    // Connect the client to the server	(optional starting in v4.7)
+    // await client.connect();
 
     const wishlistCollection = client.db("wishlistDB").collection("wishlist");
 
@@ -34,81 +31,79 @@ async function run() {
       const cursor = wishlistCollection.find();
       const result = await cursor.toArray();
       res.send(result);
-    })
+    });
 
     app.post("/wishlist", async (req, res) => {
       const wishlistItem = req.body;
       const result = await wishlistCollection.insertOne(wishlistItem);
       res.send(result);
-    })
+    });
 
     app.delete("/wishlist/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: id };
       const result = await wishlistCollection.deleteOne(query);
       res.send(result);
-    })
+    });
 
-    const postsCollection = client.db('blogPostsDB').collection('allposts');
+    const postsCollection = client.db("blogPostsDB").collection("allposts");
 
-    app.get('/allposts', async(req, res) => {
+    app.get("/allposts", async (req, res) => {
       const cursor = postsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
-    })
+    });
 
-    // Single post data 
-    app.get("/allposts/:id", async(req, res) => {
+    // Single post data
+    app.get("/allposts/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await postsCollection.findOne(query);
       res.send(result);
-    })
+    });
 
-    app.put('/allposts/:id', async(req, res) => {
+    app.put("/allposts/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
 
-      const updatedPost =req.body;
+      const updatedPost = req.body;
       const post = {
         $set: {
-            name: updatedPost.name,
-            title: updatedPost.title,
-            image: updatedPost.image,
-            category: updatedPost.category,
-            descriptionSummary: updatedPost.descriptionSummary,
-            descriptionDetail: updatedPost.descriptionDetail,
-            userPhotoURL: updatedPost.userPhotoURL,
-            userEmail: updatedPost.userEmail,
-            timestamp: updatedPost.timestamp,
-        }
-      }
+          name: updatedPost.name,
+          title: updatedPost.title,
+          image: updatedPost.image,
+          category: updatedPost.category,
+          descriptionSummary: updatedPost.descriptionSummary,
+          descriptionDetail: updatedPost.descriptionDetail,
+          userPhotoURL: updatedPost.userPhotoURL,
+          userEmail: updatedPost.userEmail,
+          timestamp: updatedPost.timestamp,
+        },
+      };
 
       const result = await postsCollection.updateOne(filter, post, options);
       res.send(result);
-    })
+    });
 
-    app.post('/allposts', async(req, res) =>{
+    app.post("/allposts", async (req, res) => {
       const newPost = req.body;
       console.log(newPost);
       const result = await postsCollection.insertOne(newPost);
       res.send(result);
-    })
+    });
 
     // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 }); 
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
 run().catch(console.dir);
-
-
-
-
 
 // -------------------------------
 
