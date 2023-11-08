@@ -28,6 +28,27 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7) 
     await client.connect();
 
+    const wishlistCollection = client.db("wishlistDB").collection("wishlist");
+
+    app.get("/wishlist", async (req, res) => {
+      const cursor = wishlistCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.post("/wishlist", async (req, res) => {
+      const wishlistItem = req.body;
+      const result = await wishlistCollection.insertOne(wishlistItem);
+      res.send(result);
+    })
+
+    app.delete("/wishlist/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: id };
+      const result = await wishlistCollection.deleteOne(query);
+      res.send(result);
+    })
+
     const postsCollection = client.db('blogPostsDB').collection('allposts');
 
     app.get('/allposts', async(req, res) => {
