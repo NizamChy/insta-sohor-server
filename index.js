@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+    // Connect the client to the server	(optional starting in v4.7) 
     await client.connect();
 
     const postsCollection = client.db('blogPostsDB').collection('allposts');
@@ -36,6 +36,7 @@ async function run() {
       res.send(result);
     })
 
+    // Single post data 
     app.get("/allposts/:id", async(req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
