@@ -27,6 +27,8 @@ async function run() {
 
     const wishlistCollection = client.db("wishlistDB").collection("wishlist");
 
+    const commentCollection = client.db("commentDB").collection("comment");
+
     app.get("/wishlist", async (req, res) => {
       const cursor = wishlistCollection.find();
       const result = await cursor.toArray();
@@ -61,6 +63,25 @@ async function run() {
       const result = await postsCollection.findOne(query);
       res.send(result);
     });
+
+    app.get("/comment", async (req, res) => {
+      const cursor = commentCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.post("/comment", async (req, res) => {
+      const newComment = req.body;
+      const result = await commentCollection.insertOne(newComment);
+      res.send(result);
+    });
+
+    app.delete("/allposts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await postsCollection.deleteOne(query);
+      res.send(result);
+    })
 
     app.put("/allposts/:id", async (req, res) => {
       const id = req.params.id;
