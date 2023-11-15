@@ -1,3 +1,5 @@
+// Backend mongodb index.jsx file 
+
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -75,6 +77,13 @@ async function run() {
       const result = await commentCollection.insertOne(newComment);
       res.send(result);
     });
+
+    app.delete("/comment/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await commentCollection.deleteOne(query);
+      res.send(result);
+    })
 
     app.delete("/allposts/:id", async (req, res) => {
       const id = req.params.id;
